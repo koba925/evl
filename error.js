@@ -1,4 +1,4 @@
-const error = mes => { console.error(mes); process.exit(1) }
+const error = mes => { throw(mes) }
 
 module.exports = {
   error
