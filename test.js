@@ -1,3 +1,5 @@
+const assert = require("assert/strict");
+
 const eq = (a, b) => a === b
 const eqArrayShallow = (a, b) => {
   if (a.length !== b.length) return false
@@ -14,11 +16,7 @@ const defaultDisp = (actual, expected) => {
 }
 
 const test = (actual, expected, comp = eq, disp = defaultDisp) => {
-  if (!comp(actual, expected)) {
-    disp(actual, expected)
-    return false
-  }
-  return true
+  assert.equal(actual, expected)
 }
 
 const testEq = (actual, expected, disp = defaultDisp) => 

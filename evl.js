@@ -1,5 +1,5 @@
 const { test } = require("./test")
-const { id, testEq } = require("./functions")
+const { id, testEq } = require("./functions").default
 const {
   valueOf, eqValue, 
   makeNumber, isNumber, add, 

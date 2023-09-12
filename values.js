@@ -1,8 +1,6 @@
 const { error } = require("./error")
-const { 
-  noDisp, defaultDisp, test, testEq, testTrue, testFalse, testEqArrayShallow
-} = require("./test")
-const { id, eq, eqArrayShallow } = require("./functions")
+const { id, eq } = require("./functions")
+const assert = require("assert/strict")
 
 const makeValue = (type, val) => ({ type, val })
 const typeOf = a => a.type
@@ -145,9 +143,8 @@ const toString = (a, depth = 4) => {
 const print = (...as) => 
   console.log(as.map(a => toString(a)).join(" "))
 
-const testEqual = (actual, expected, disp = (actual, expected) => 
-  defaultDisp(toString(actual), toString(expected))
-) => test(actual, expected, equal, disp)
+const testEqual = (actual, expected, message) => 
+  assert(equal(actual, expected), message)
 
   
 module.exports = {
@@ -167,74 +164,90 @@ module.exports = {
 
 if (require.main !== module) return
 
-testEq(typeOf(makeValue("sometype", 1)), "sometype")
-testEq(valueOf(makeValue("sometype", 1)), 1)
-testEq(eqVal(makeValue("sometype", 1), makeValue("sometype", 1)), true)
-testEq(eqVal(makeValue("sometype", 1), makeValue("sometype", 2)), false)
-testEq(eqVal(makeValue("sometype", 1), makeValue("othertype", 1)), false)
+assert.equal(typeOf(makeValue("sometype", 1)), "sometype")
+assert.equal(valueOf(makeValue("sometype", 1)), 1)
+assert.equal(eqVal(makeValue("sometype", 1), makeValue("sometype", 1)), true)
+assert.equal(eqVal(makeValue("sometype", 1), makeValue("sometype", 2)), false)
+assert.equal(eqVal(makeValue("sometype", 1), makeValue("othertype", 1)), false)
+assert.equal(typeOf(makeNumber(1)), "number")
+assert.equal(valueOf(makeNumber(1)), 1)
 
-testEq(typeOf(makeNumber(1)), "number")
-testEq(valueOf(makeNumber(1)), 1)
-testEq(isNumber(makeNumber(1)), true)
-testEq(isNumber(makeString("abc")), false)
-testEq(add(makeNumber(1), makeNumber(2)), 3)
+assert.equal(isNumber(makeNumber(1)), true)
+assert.equal(isNumber(makeString("abc")), false)
+assert.equal(add(makeNumber(1), makeNumber(2)), 3)
 
-testEq(typeOf(makeString("abc")), "string")
-testEq(valueOf(makeString("abc")), "abc")
-testEq(isString(makeString("abc")), true)
-testEq(isString(makeNumber(1)), false)
+assert.equal(typeOf(makeString("abc")), "string")
+assert.equal(valueOf(makeString("abc")), "abc")
+assert.equal(isString(makeString("abc")), true)
+assert.equal(isString(makeNumber(1)), false)
 
-testEq(typeOf(makeBool(true)), "bool")
-testEq(typeOf(makeBool(false)), "bool")
-testEq(valueOf(makeBool(true)), true)
-testEq(valueOf(makeBool(false)), false)
-testEq(isBool(makeBool(true)), true)
-testEq(isBool(makeBool(false)), true)
-testEq(isBool(makeNumber(1)), false)
+assert.equal(typeOf(makeBool(true)), "bool")
+assert.equal(typeOf(makeBool(false)), "bool")
+assert.equal(valueOf(makeBool(true)), true)
+assert.equal(valueOf(makeBool(false)), false)
+assert.equal(isBool(makeBool(true)), true)
+assert.equal(isBool(makeBool(false)), true)
+assert.equal(isBool(makeNumber(1)), false)
 
-testEq(typeOf(makeSymbol("abc")), "symbol")
-testEq(valueOf(makeSymbol("abc")), "abc")
-testEq(isSymbol(makeSymbol("abc")), true)
-testEq(isSymbol(makeNumber(1)), false)
-testEq(symbolIs(makeSymbol("abc"), "abc"), true)
-testEq(symbolIs(makeSymbol("abc"), "def"), false)
+assert.equal(typeOf(makeSymbol("abc")), "symbol")
+assert.equal(valueOf(makeSymbol("abc")), "abc")
+assert.equal(isSymbol(makeSymbol("abc")), true)
+assert.equal(isSymbol(makeNumber(1)), false)
+assert.equal(symbolIs(makeSymbol("abc"), "abc"), true)
+assert.equal(symbolIs(makeSymbol("abc"), "def"), false)
 
-testEq(typeOf(makePrimOp(id)), "primop")
-testEq(isPrimOp(makePrimOp(id)), true)
-testEq(isPrimOp(makeNumber(1)), false)
+assert.equal(typeOf(makePrimOp(id)), "primop")
+assert.equal(isPrimOp(makePrimOp(id)), true)
+assert.equal(isPrimOp(makeNumber(1)), false)
 
-testEq(typeOf(nil), "nil")
-testEq(valueOf(nil), null)
-testEq(isNil(nil), true)
-testEq(isNil(makeNumber(1)), false)
+assert.equal(typeOf(nil), "nil")
+assert.equal(valueOf(nil), null)
+assert.equal(isNil(nil), true)
+assert.equal(isNil(makeNumber(1)), false)
 
-testEq(typeOf(makePair(1, 2)), "pair")
-testEq(isPair(makePair(1, 2)), true)
-testEq(car(cons(1, 2)), 1)
-testEq(cdr(cons(1, 2)), 2)
+assert.equal(typeOf(makePair(1, 2)), "pair")
+assert.equal(isPair(makePair(1, 2)), true)
+assert.equal(car(cons(1, 2)), 1)
+assert.equal(cdr(cons(1, 2)), 2)
 
 const p = cons(1, 2)
 setCar(p, 3)
-testEq(car(p), 3)
+assert.equal(car(p), 3)
 setCdr(p, 4)
-testEq(cdr(p), 4)
+assert.equal(cdr(p), 4)
 
 const one = makeNumber(1)
 const two = makeNumber(2)
 
-testTrue(equal(makeNumber(1), makeNumber(1)))
-testFalse(equal(makeNumber(1), makeNumber(2)))
-testFalse(equal(cons(makeNumber(1), makeNumber(2)),
-               makeNumber(1)))
-testFalse(equal(makeNumber(1),
-               cons(makeNumber(1), makeNumber(2))))
-testFalse(equal(cons(makeNumber(1), makeNumber(2)),
-               cons(makeNumber(2), makeNumber(2))))
-testTrue(equal(cons(makeNumber(1), makeNumber(2)),
-               cons(makeNumber(1), makeNumber(2))))
+assert.equal(equal(makeNumber(1), makeNumber(1)), true)
+assert.equal(equal(makeNumber(1), makeNumber(2)), false)
+assert.equal(
+  equal(
+    cons(makeNumber(1), makeNumber(2)),
+    makeNumber(1)),
+  false
+)
+assert.equal(
+  equal(
+    makeNumber(1),
+    cons(makeNumber(1), makeNumber(2))),
+  false
+)
+assert.equal(
+  equal(
+    cons(makeNumber(1), makeNumber(2)),
+    cons(makeNumber(2), makeNumber(2))),
+  false
+)
+assert.equal(
+  equal(
+    cons(makeNumber(1), makeNumber(2)),
+    cons(makeNumber(1), makeNumber(2))),
+  true
+)
 
-testTrue(testEqual(makeNumber(1), makeNumber(1)))
-testFalse(testEqual(makeNumber(1), makeNumber(2), noDisp))
+assert.throws(() => testEqual(makeNumber(1), makeNumber(1)))
+assert.doesNotThrow(() => testEqual(makeNumber(1), makeNumber(2)))
 
 testEqual(makeList(), nil)
 testEqual(makeList(makeNumber(1)), cons(makeNumber(1), nil))
@@ -243,19 +256,12 @@ testEqual(
   cons(makeNumber(1), cons(makeNumber(2), nil))
 )
 
-testTrue(isAtom(makeNumber(1)))
-testFalse(isAtom(cons(makeNumber(1), nil)))
-testFalse(isAtom(nil))
+testTrue(isAtom(makeNumber(1)), true)
+testFalse(isAtom(cons(makeNumber(1), nil)), false)
+testFalse(isAtom(nil), false)
 
 testEqual(toList("0"), makeNumber(0))
 testEqual(toList(" 1"), makeNumber(1))
 testEqual(toList("1 "), makeNumber(1))
 testEqual(toList("1 1"), makeNumber(1))
-
-
-
-
-
-
-
-
+*/
